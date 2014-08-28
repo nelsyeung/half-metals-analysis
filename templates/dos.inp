@@ -1,0 +1,17 @@
+###############################################################################
+#  SPR-KKR DOS input file 
+###############################################################################
+ 
+CONTROL  DATASET     = CoFe0.25Mn0.25Ga0.25Si0.2
+         ADSI        = DOS
+         POTFIL      = pot.pot
+         PRINT = 0
+
+MODE     tmpMODE
+
+TAU      BZINT= POINTS  NKTAB= tmpNKTAB
+ 
+ENERGY   GRID=3  NE={tmpNE}
+         EMIN=tmpEMIN   EMAX=tmpEMAX   ImE=tmpImE Ry
+ 
+TASK     DOS
