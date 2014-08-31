@@ -2,7 +2,7 @@
 HEADER    'SCF-start data'
 *******************************************************************************
 TITLE     'SPR-KKR calculation'
-SYSTEM    Co
+SYSTEM    tmpSYSTEM
 PACKAGE   SPRKKR
 FORMAT    6  (21.05.2007)
 *******************************************************************************
@@ -55,7 +55,7 @@ BASSCALE      1.0000000000    1.0000000000    1.0000000000
 *******************************************************************************
 OCCUPATION
         IQ     IREFQ       IMQ       NOQ  ITOQ  CONC
-         1         1         1         1     1 1.000
+         1         1         1         1     1 tmpCONC1
          2         2         2         4     2 tmpCONC2 3 tmpCONC3 4 tmpCONC4 5 tmpCONC5
 *******************************************************************************
 REFERENCE SYSTEM
@@ -79,7 +79,7 @@ MESH-TYPE EXPONENTIAL
 *******************************************************************************
 TYPES
    IT     TXTT        ZT     NCORT     NVALT    NSEMCORSHLT
-    1     Co              27        18         9              0
+    1     tmpIT1
     2     tmpIT2
     3     tmpIT3
     4     tmpIT4

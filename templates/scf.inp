@@ -2,16 +2,16 @@
 #  SPR-KKR SCF input file
 ###############################################################################
  
-CONTROL  DATASET     = CoFe0.25Mn0.25Ga0.25Si0.2
-         ADSI        = SCF 
-         POTFIL      = pot.pot 
-         PRINT = 0    
+CONTROL  DATASET     = tmpDATASET
+         ADSI        = SCF
+         POTFIL      = pot.pot
+         PRINT = 0
 
 MODE     tmpMODE
 
 TAU      BZINT= POINTS  NKTAB= tmpNKTAB 
  
-ENERGY   GRID=5  NE={tmpNE} 
+ENERGY   GRID=5  NE={30}
          EMIN=-0.2   ImE=0.0 Ry
  
 SCF      NITER=200 MIX=0.20 VXC=VWN
