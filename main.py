@@ -6,7 +6,7 @@ import inspect
 
 # Add extra libraries' directories to import list
 baseLibDir = os.path.join(os.path.realpath(os.path.dirname(
-    inspect.getfile(inspect.currentframe()))), 'nlib')
+    inspect.getfile(inspect.currentframe()))), 'lib')
 compoundsLibDir = os.path.join(baseLibDir, 'compounds')
 
 sys.path.append(compoundsLibDir)
@@ -17,4 +17,4 @@ from five_elements import FiveElements
 if __name__ == '__main__':
     compounds = FiveElements('CFMGS/B2', 'Co Fe Mn Ga Si',
                              'sc_5_elements_b2', '5.333751602764')
-    compounds.generateConcentrations(20)
+    compounds.generateConcentrations(3)

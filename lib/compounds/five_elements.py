@@ -2,6 +2,7 @@
 import os
 import sys
 import inspect
+import math
 
 baseLibDir = os.path.join(os.path.realpath(os.path.dirname(
              inspect.getfile(inspect.currentframe()))), '..')
@@ -25,28 +26,18 @@ class FiveElements(Compound):
         """ Generate the required permutations of concentrations """
         if self.potFile == 'sc_5_elements_b2':
             a, b, c, d, e = 1.0, 0.5, 0.0, 0.5, 0.0
-            dInit, eInit = d, e
-            step = b / num
+            step = b / (num - 1)
             precision = len(str(step).split('.')[1])
-            aStr = nmod.float2str(precision, a)
-
-            for _ in range(0, num + 1):
-                d, e = dInit, eInit
-
-                for _ in range(0, num + 1):
-                    bStr = nmod.float2str(precision, b)
-                    cStr = nmod.float2str(precision, c)
-                    dStr = nmod.float2str(precision, d)
-                    eStr = nmod.float2str(precision, e)
-                    conc = (aStr + '_' + bStr + '_' + cStr
-                            + '_' + dStr + '_' + eStr)
-
-                    d = round(d - step, 3)
-                    e = round(e + step, 3)
-                    self.create(conc)
-
-                b = round(b - step, 3)
-                c = round(c + step, 3)
+            conc1 = nmod.float2str(precision, a)
+            
+            for i in range(0, num * num):
+                x, y = i % num, int(i / num)
+                conc2 = nmod.float2str(precision, b - x * step)
+                conc3 = nmod.float2str(precision, c + x * step)
+                conc4 = nmod.float2str(precision, d - y * step)
+                conc5 = nmod.float2str(precision, e + y * step)
+                self.create(conc1 + '_' + conc2 + '_'
+                            + conc3 + '_' + conc4 + '_' + conc5)
         else:
             print(self.potFile + ' has not yet been implemented.')
             nmod.nexit()
