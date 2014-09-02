@@ -8,13 +8,19 @@ import inspect
 baseLibDir = os.path.join(os.path.realpath(os.path.dirname(
     inspect.getfile(inspect.currentframe()))), 'lib')
 compoundsLibDir = os.path.join(baseLibDir, 'compounds')
+analysisLibDir = os.path.join(baseLibDir, 'analysis')
 
 sys.path.append(compoundsLibDir)
+sys.path.append(analysisLibDir)
 
 # Import own libraries
 from five_elements import FiveElements
+from analysis import Analysis
 
 if __name__ == '__main__':
     compounds = FiveElements('CFMGS/B2', 'Co Fe Mn Ga Si',
                              'sc_5_elements_b2', '5.333751602764')
-    compounds.generateConcentrations(3)
+    compounds.settings['nktab'] = '1000'
+    compounds.settings['SCFNE'] = '60'
+    compounds.settings['DOSNE'] = '100'
+    compounds.generateConcentrations(21)

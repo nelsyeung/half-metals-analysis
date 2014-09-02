@@ -2,7 +2,6 @@
 import os
 import sys
 import inspect
-import math
 
 baseLibDir = os.path.join(os.path.realpath(os.path.dirname(
              inspect.getfile(inspect.currentframe()))), '..')

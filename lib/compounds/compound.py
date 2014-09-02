@@ -28,7 +28,9 @@ class Compound(object):
         self.settings = {
             'mode': 'SP-SREL',
             'nktab': '250',
-            'ImE': '0.0005'
+            'ImE': '0.0005',
+            'SCFNE': '30',
+            'DOSNE': '50'
         }
         error = False # Error flag for exiting program.
 
@@ -86,9 +88,6 @@ class Compound(object):
             + self.elements[3] + conc4
             + self.elements[4] + conc5
         )
-        mode = self.settings['mode']
-        nktab = self.settings['nktab']
-        ImE = self.settings['ImE']
 
         # Check if directory already exists, if not, carry on.
         if os.path.isdir(conc):
@@ -102,35 +101,37 @@ class Compound(object):
 
             # SCF
             reps = {
-                "tmpDATASET" : fullname,
-                "tmpMODE"    : mode,
-                "tmpNKTAB"   : nktab
+                'tmpDATASET' : fullname,
+                'tmpMODE'    : self.settings['mode'],
+                'tmpNKTAB'   : self.settings['nktab'],
+                'tmpSCFNE'   : self.settings['SCFNE']
             }
             self.modFile(os.path.join(conc, 'scf.inp'), 'scf.inp', reps)
 
             # DOS
             reps = {
-                "tmpDATASET" : fullname,
-                "tmpMODE"    : mode,
-                "tmpNKTAB"   : nktab,
-                "tmpImE"     : ImE
+                'tmpDATASET' : fullname,
+                'tmpMODE'    : self.settings['mode'],
+                'tmpNKTAB'   : self.settings['nktab'],
+                'tmpDOSNE'   : self.settings['DOSNE'],
+                'tmpImE'     : self.settings['ImE']
             }
             self.modFile(os.path.join(conc, 'dos.inp'), 'dos.inp', reps)
 
             # POT
             reps = {
-                "tmpSYSTEM" : fullname,
-                "tmpALAT"   : self.alat,
-                "tmpCONC1"  : conc1,
-                "tmpCONC2"  : conc2,
-                "tmpCONC3"  : conc3,
-                "tmpCONC4"  : conc4,
-                "tmpCONC5"  : conc5,
-                "tmpIT1"    : IT1,
-                "tmpIT2"    : IT2,
-                "tmpIT3"    : IT3,
-                "tmpIT4"    : IT4,
-                "tmpIT5"    : IT5
+                'tmpSYSTEM' : fullname,
+                'tmpALAT'   : self.alat,
+                'tmpCONC1'  : conc1,
+                'tmpCONC2'  : conc2,
+                'tmpCONC3'  : conc3,
+                'tmpCONC4'  : conc4,
+                'tmpCONC5'  : conc5,
+                'tmpIT1'    : IT1,
+                'tmpIT2'    : IT2,
+                'tmpIT3'    : IT3,
+                'tmpIT4'    : IT4,
+                'tmpIT5'    : IT5
             }
             self.modFile(os.path.join(conc, 'pot.pot'),
                          self.potFile + '.pot', reps)
