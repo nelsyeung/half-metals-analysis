@@ -5,6 +5,7 @@
 cd $PBS_O_WORKDIR
 
 # Variable definitions
+CWD=${PWD##*/}
 LOG="nlog"
 DATETIME=$(date +"%d/%m/%y %T")
 T=0 # Initialise total time taken.
@@ -17,6 +18,10 @@ printToLog() {
     printf "$1 - Time taken: %02dh %02dm %02ds\n" "$(((S-T)/3600%24))" "$(((S-T)/60%60))" "$(((S-T)%60))" >> $LOG
 }
 
+mvToUnsuccessful() {
+    mv "../$CWD" ../../unsuccessful
+}
+
 # Append to or create log file with current time.
 if [ -f $LOG ]; then
     printf "\n\n" >> $LOG
@@ -25,6 +30,7 @@ printf "#######################\n# $DATETIME\n#######################\n" >> $LOG
 
 cp pot.pot pot.pot_old # Backup initial potential file.
 
+# Run SCF
 mpirun kkrscf6.3MPI scf.inp > scf.out
 
 # Check if potential file is created from kkrscf,
@@ -35,6 +41,7 @@ if [ -f "pot.pot_new" ]; then
 
     cp pot.pot_new pot.pot # Replace the original potential file with the converged one.
 
+    # Run DOS
     mpirun kkrgen6.3MPI dos.inp 
 
     # Check if DOS file is created from kkrgen,
@@ -50,13 +57,25 @@ if [ -f "pot.pot_new" ]; then
         gracebat dos.agr -printfile dos.ps
     else
         # Move to unsuccessful
-        echo "Temporary unsuccessful message."
         printToLog "!!! ERROR: kkrgen6.3MPI dos.inp" $T
+        mvToUnsuccessful
+    fi
+
+    # Run BSF
+    mpirun kkrgen6.3MPI bsf.inp
+
+    # If BSF file is not created from kkrgen,
+    # move folder to unsuccessful.
+    if [ ! -f *spol.bsf ]; then
+        T=$SECONDS
+
+        printToLog "!!! ERROR: kkrgen6.3MPI bsf.inp" $T
+        mvToUnsuccessful
     fi
 else
     # Move to unsuccessful
-    echo "Temporary unsuccessful message."
     printToLog "!!! ERROR: kkrscf6.3MPI scf.inp > scf.out" $T
+    mvToUnsuccessful
 fi
 
 printf "Total time taken: %02dh %02dm %02ds" "$((S/3600%24))" "$((S/60%60))" "$((S%60))" >> $LOG

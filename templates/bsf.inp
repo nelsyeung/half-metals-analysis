@@ -1,0 +1,19 @@
+###############################################################################
+#  SPR-KKR BLOCHSF input file
+###############################################################################
+ 
+CONTROL  DATASET     = tmpDATASET
+         ADSI        = BLOCHSF 
+         POTFIL      = pot.pot 
+         PRINT = 0    
+
+MODE     tmpMODE
+ 
+TAU      BZINT= POINTS  NKTAB= tmpNKTAB 
+ 
+ENERGY   GRID={3}  NE={tmpBSFNE} 
+         EMIN=tmpEMIN   EMAX=tmpEMAX   ImE=0.0 Ry
+
+TASK     BSF
+         NK1 = tmpNK1    K1 = tmpK1
+         NK2 = tmpNK2    K2 = tmpK2

@@ -19,8 +19,11 @@ from analysis import Analysis
 
 if __name__ == '__main__':
     compounds = FiveElements('CFMGS/B2', 'Co Fe Mn Ga Si',
-                             'sc_5_elements_b2', '5.333751602764')
-    compounds.settings['nktab'] = '1000'
-    compounds.settings['SCFNE'] = '60'
-    compounds.settings['DOSNE'] = '100'
+                            'sc_5_elements_b2', '5.333751602764')
+    # compounds.settings['nktab'] = '1000'
+    # compounds.settings['SCF']['NE'] = '60'
+    # compounds.settings['DOS']['NE'] = '100'
+    # compounds.settings['BSF']['NK'] = '120'
     compounds.generateConcentrations(21)
+    compounds.generateDOS()
+    compounds.generateBSF()

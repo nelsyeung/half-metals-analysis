@@ -11,7 +11,7 @@ MODE     tmpMODE
 
 TAU      BZINT= POINTS  NKTAB= tmpNKTAB 
  
-ENERGY   GRID=5  NE={SCFNE}
+ENERGY   GRID={5}  NE={tmpSCFNE}
          EMIN=-0.2   ImE=0.0 Ry
  
 SCF      NITER=200 MIX=0.20 VXC=VWN

@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -l nodes=4:ppn=1:theory,pvmem=256mb,walltime=08:00:00
+#PBS -l nodes=4:ppn=4,pvmem=256mb,walltime=08:00:00
 #PBS -V
 #PBS -t 1-441
 

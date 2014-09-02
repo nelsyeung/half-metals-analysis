@@ -27,16 +27,17 @@ class FiveElements(Compound):
             a, b, c, d, e = 1.0, 0.5, 0.0, 0.5, 0.0
             step = b / (num - 1)
             precision = len(str(step).split('.')[1])
-            conc1 = nmod.float2str(precision, a)
+            conc = [None]*5
+            conc[0] = nmod.float2str(precision, a)
             
             for i in range(0, num * num):
                 x, y = i % num, int(i / num)
-                conc2 = nmod.float2str(precision, b - x * step)
-                conc3 = nmod.float2str(precision, c + x * step)
-                conc4 = nmod.float2str(precision, d - y * step)
-                conc5 = nmod.float2str(precision, e + y * step)
-                self.create(conc1 + '_' + conc2 + '_'
-                            + conc3 + '_' + conc4 + '_' + conc5)
+                conc[1] = nmod.float2str(precision, b - x * step)
+                conc[2] = nmod.float2str(precision, c + x * step)
+                conc[3] = nmod.float2str(precision, d - y * step)
+                conc[4] = nmod.float2str(precision, e + y * step)
+                self.create(conc[0] + '_' + conc[1] + '_'
+                            + conc[2] + '_' + conc[3] + '_' + conc[4])
         else:
             print(self.potFile + ' has not yet been implemented.')
             nmod.nexit()

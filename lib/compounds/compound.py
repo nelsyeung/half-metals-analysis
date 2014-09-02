@@ -29,8 +29,21 @@ class Compound(object):
             'mode': 'SP-SREL',
             'nktab': '250',
             'ImE': '0.0005',
-            'SCFNE': '30',
-            'DOSNE': '50'
+            'SCF': {
+                'NE': '30'
+            },
+            'DOS': {
+                'NE': '50'
+            },
+            'BSF': {
+                'NE': '1',
+                'EMIN': '1.0',
+                'EMAX': '1.0',
+                'NK1': '60',
+                'NK2': '60',
+                'K1': '{1.0, 0.0, 0.0}',
+                'K2': '{0.0, 1.0, 0.0}'
+            }
         }
         error = False # Error flag for exiting program.
 
@@ -46,7 +59,7 @@ class Compound(object):
             error = True
 
         if (os.path.exists(self.potPath)
-            is False):
+                is False):
             print('The potential file provided does not exists.')
             error = True
 
@@ -62,78 +75,119 @@ class Compound(object):
                 for line in ftmp:
                     fnew.write(nmod.replaceAll(line, reps))
 
-    def create(self, conc):
+    def create(self, fullConc):
         """ Create the specified compound """
         elementsFile = os.path.join(self.templatesDir, 'elements.txt')
 
         # Set the different concentrations
-        concentrations = conc.split('_')
-        conc1 = concentrations[0]
-        conc2 = concentrations[1]
-        conc3 = concentrations[2]
-        conc4 = concentrations[3]
-        conc5 = concentrations[4]
+        concentrations = fullConc.split('_')
+        conc = [None]*5
+        for i in range(len(concentrations)):
+            conc[i] = concentrations[i]
 
         # Set the different elements
-        IT1 = nmod.findLine(elementsFile, self.elements[0])
-        IT2 = nmod.findLine(elementsFile, self.elements[1])
-        IT3 = nmod.findLine(elementsFile, self.elements[2])
-        IT4 = nmod.findLine(elementsFile, self.elements[3])
-        IT5 = nmod.findLine(elementsFile, self.elements[4])
+        IT = [None]*5
+        for i in range(len(self.elements)):
+            IT[i] = nmod.findLine(elementsFile, self.elements[i])
 
         fullname = (
-            self.elements[0] + conc1
-            + self.elements[1] + conc2
-            + self.elements[2] + conc3
-            + self.elements[3] + conc4
-            + self.elements[4] + conc5
+            self.elements[0] + conc[0]
+            + self.elements[1] + conc[1]
+            + self.elements[2] + conc[2]
+            + self.elements[3] + conc[3]
+            + self.elements[4] + conc[4]
         )
 
         # Check if directory already exists, if not, carry on.
-        if os.path.isdir(conc):
-            print(conc + ' already exists, it will not be overwritten.')
+        if os.path.isdir(fullConc):
+            print(fullConc + ' already exists, it will not be overwritten.')
         else:
-            os.makedirs(conc)
+            os.makedirs(fullConc)
 
             # Start the creation process.
             # Take all the template files, copy it to the new directory
             # and replace the "tmp" strings with the settings.
+
+            # POT
+            reps = {
+                'tmpSYSTEM' : fullname,
+                'tmpALAT'   : self.alat,
+                'tmpCONC1'  : conc[0],
+                'tmpCONC2'  : conc[1],
+                'tmpCONC3'  : conc[2],
+                'tmpCONC4'  : conc[3],
+                'tmpCONC5'  : conc[4],
+                'tmpIT1'    : IT[0],
+                'tmpIT2'    : IT[1],
+                'tmpIT3'    : IT[2],
+                'tmpIT4'    : IT[3],
+                'tmpIT5'    : IT[4]
+            }
+            self.modFile(os.path.join(fullConc, 'pot.pot'),
+                         self.potFile + '.pot', reps)
 
             # SCF
             reps = {
                 'tmpDATASET' : fullname,
                 'tmpMODE'    : self.settings['mode'],
                 'tmpNKTAB'   : self.settings['nktab'],
-                'tmpSCFNE'   : self.settings['SCFNE']
+                'tmpSCFNE'   : self.settings['SCF']['NE']
             }
-            self.modFile(os.path.join(conc, 'scf.inp'), 'scf.inp', reps)
-
-            # DOS
-            reps = {
-                'tmpDATASET' : fullname,
-                'tmpMODE'    : self.settings['mode'],
-                'tmpNKTAB'   : self.settings['nktab'],
-                'tmpDOSNE'   : self.settings['DOSNE'],
-                'tmpImE'     : self.settings['ImE']
-            }
-            self.modFile(os.path.join(conc, 'dos.inp'), 'dos.inp', reps)
-
-            # POT
-            reps = {
-                'tmpSYSTEM' : fullname,
-                'tmpALAT'   : self.alat,
-                'tmpCONC1'  : conc1,
-                'tmpCONC2'  : conc2,
-                'tmpCONC3'  : conc3,
-                'tmpCONC4'  : conc4,
-                'tmpCONC5'  : conc5,
-                'tmpIT1'    : IT1,
-                'tmpIT2'    : IT2,
-                'tmpIT3'    : IT3,
-                'tmpIT4'    : IT4,
-                'tmpIT5'    : IT5
-            }
-            self.modFile(os.path.join(conc, 'pot.pot'),
-                         self.potFile + '.pot', reps)
+            self.modFile(os.path.join(fullConc, 'scf.inp'), 'scf.inp', reps)
 
             print(fullname + " has been created.")
+
+    def generateDOS(self):
+        """ Generate DOS input files for all the compounds created """
+        settingsDOS = self.settings['DOS']
+
+        print('Generating DOS input files.')
+
+        for _, dirs, _ in os.walk('./'):
+            for directory in dirs:
+                if (os.path.exists(os.path.join(directory, 'dos.inp'))
+                        is True):
+                    print(directory + ' already contains dos.inp, '
+                          + 'it will not be overwritten.')
+                else:
+                    reps = {
+                        'tmpDATASET' : directory,
+                        'tmpMODE'    : self.settings['mode'],
+                        'tmpNKTAB'   : self.settings['nktab'],
+                        'tmpDOSNE'   : settingsDOS['NE'],
+                        'tmpImE'     : self.settings['ImE']
+                    }
+                    self.modFile(os.path.join(directory, 'dos.inp'),
+                                 'dos.inp', reps)
+
+        print('Finish generating DOS input files.')
+
+    def generateBSF(self):
+        """ Generate BSF input files for all the compounds created """
+        settingsBSF = self.settings['BSF']
+
+        print('Generating BSF input files.')
+
+        for _, dirs, _ in os.walk('./'):
+            for directory in dirs:
+                if (os.path.exists(os.path.join(directory, 'bsf.inp'))
+                        is True):
+                    print(directory + ' already contains bsf.inp, '
+                          + 'it will not be overwritten.')
+                else:
+                    reps = {
+                        'tmpDATASET' : directory,
+                        'tmpMODE'    : self.settings['mode'],
+                        'tmpNKTAB'   : self.settings['nktab'],
+                        'tmpBSFNE'   : settingsBSF['NE'],
+                        'tmpEMIN'    : settingsBSF['EMIN'],
+                        'tmpEMAX'    : settingsBSF['EMAX'],
+                        'tmpNK1'     : settingsBSF['NK1'],
+                        'tmpNK2'     : settingsBSF['NK1'],
+                        'tmpK1'      : settingsBSF['K1'],
+                        'tmpK2'      : settingsBSF['K2']
+                    }
+                    self.modFile(os.path.join(directory, 'bsf.inp'),
+                                 'bsf.inp', reps)
+
+        print('Finish generating BSF input files.')
