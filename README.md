@@ -1,1 +1,2 @@
 # Half-metals analysis
+Code for analysing half metallicity of compounds using Density of States (DOS) and Bloch Spectral Function (BSF) data. It also includes generation of compounds with different concentrations with a starting potential and a Self-Consistent Field (SCF) input file for use with the Munich Spin Polarised Relativistic Korringa-Kohn-Rostoker (SPRKKR) package. It can also generate DOS and BSF input files.
