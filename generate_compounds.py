@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""" Main python program for running codes """
+""" Generate compounds """
 import os
 import sys
 import inspect
@@ -8,14 +8,11 @@ import inspect
 baseLibDir = os.path.join(os.path.realpath(os.path.dirname(
     inspect.getfile(inspect.currentframe()))), 'lib')
 compoundsLibDir = os.path.join(baseLibDir, 'compounds')
-analysisLibDir = os.path.join(baseLibDir, 'analysis')
 
 sys.path.append(compoundsLibDir)
-sys.path.append(analysisLibDir)
 
 # Import own libraries
 from five_elements import FiveElements
-from analysis import Analysis
 
 if __name__ == '__main__':
     compounds = FiveElements('CFMGS/B2', 'Co Fe Mn Ga Si',

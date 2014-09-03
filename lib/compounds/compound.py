@@ -68,10 +68,10 @@ class Compound(object):
         else:
             os.chdir(self.jobsDir)
 
-    def modFile(self, new, tmp, reps):
+    def modTemplateFile(self, new, tmp, reps):
         """ Copy and modify the specified template file to a new location """
-        with open(new, "w+") as fnew:
-            with open(os.path.join(self.templatesDir, tmp), "r") as ftmp:
+        with open(new, 'w+') as fnew:
+            with open(os.path.join(self.templatesDir, tmp), 'r') as ftmp:
                 for line in ftmp:
                     fnew.write(nmod.replaceAll(line, reps))
 
@@ -123,7 +123,7 @@ class Compound(object):
                 'tmpIT4'    : IT[3],
                 'tmpIT5'    : IT[4]
             }
-            self.modFile(os.path.join(fullConc, 'pot.pot'),
+            self.modTemplateFile(os.path.join(fullConc, 'pot.pot'),
                          self.potFile + '.pot', reps)
 
             # SCF
@@ -133,7 +133,7 @@ class Compound(object):
                 'tmpNKTAB'   : self.settings['nktab'],
                 'tmpSCFNE'   : self.settings['SCF']['NE']
             }
-            self.modFile(os.path.join(fullConc, 'scf.inp'), 'scf.inp', reps)
+            self.modTemplateFile(os.path.join(fullConc, 'scf.inp'), 'scf.inp', reps)
 
             print(fullname + " has been created.")
 
@@ -157,7 +157,7 @@ class Compound(object):
                         'tmpDOSNE'   : settingsDOS['NE'],
                         'tmpImE'     : self.settings['ImE']
                     }
-                    self.modFile(os.path.join(directory, 'dos.inp'),
+                    self.modTemplateFile(os.path.join(directory, 'dos.inp'),
                                  'dos.inp', reps)
 
         print('Finish generating DOS input files.')
@@ -177,7 +177,6 @@ class Compound(object):
                 else:
                     reps = {
                         'tmpDATASET' : directory,
-                        'tmpMODE'    : self.settings['mode'],
                         'tmpNKTAB'   : self.settings['nktab'],
                         'tmpBSFNE'   : settingsBSF['NE'],
                         'tmpEMIN'    : settingsBSF['EMIN'],
@@ -187,7 +186,7 @@ class Compound(object):
                         'tmpK1'      : settingsBSF['K1'],
                         'tmpK2'      : settingsBSF['K2']
                     }
-                    self.modFile(os.path.join(directory, 'bsf.inp'),
+                    self.modTemplateFile(os.path.join(directory, 'bsf.inp'),
                                  'bsf.inp', reps)
 
         print('Finish generating BSF input files.')

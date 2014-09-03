@@ -7,8 +7,6 @@ CONTROL  DATASET     = tmpDATASET
          POTFIL      = pot.pot 
          PRINT = 0    
 
-MODE     tmpMODE
- 
 TAU      BZINT= POINTS  NKTAB= tmpNKTAB 
  
 ENERGY   GRID={3}  NE={tmpBSFNE} 

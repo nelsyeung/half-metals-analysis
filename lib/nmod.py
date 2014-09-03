@@ -8,7 +8,7 @@ def chunks(l, size):
 
 def findLine(filename, s):
     """ Return first encountered line from a file with matching string """
-    value = ""
+    value = ''
     with open(filename, "r") as f:
         for line in f:
             if s in line:
@@ -30,12 +30,12 @@ def ntabulate(matrix):
     """ Return a nice tabulated string from a matrix """
     s = [[str(e) for e in row] for row in matrix]
     lens = [len(max(col, key=len)) for col in zip(*s)]
-    fmt = " " . join("{{:{}}}".format(x) for x in lens)
-    return "\n" . join([fmt.format(*row) for row in s])
+    fmt = ' ' . join('{{:{}}}'.format(x) for x in lens)
+    return '\n' . join([fmt.format(*row) for row in s])
 
 def float2str(prec, val):
     """ Return a nicely formatted string from a float """
-    return "{val:.{prec}f}".format(prec=prec, val=val)
+    return '{val:.{prec}f}'.format(prec=prec, val=val)
 
 def storeFile(filename, text):
     """ Save text into a new file """
@@ -44,10 +44,17 @@ def storeFile(filename, text):
     except OSError:
         pass
 
-    with open(filename, "a+") as f:
+    with open(filename, 'a+') as f:
         f.write(text)
 
 def nexit():
     """ Standard exit program function """
     print('Exiting program...')
     raise SystemExit
+
+def seconds2str(s):
+    """ Return a nicely formatted time string from seconds """
+    seconds = str(s % 60)
+    minutes = str(int(s / 60) % 60)
+    hours = str(int(s / 3600))
+    return hours + 'h ' + minutes + 'm ' + seconds + 's'
