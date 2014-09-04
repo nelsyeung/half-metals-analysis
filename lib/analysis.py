@@ -1,7 +1,15 @@
-""" Class for analysing DOS and BLOCHSF data """
+""" Base analysis class for analysing DOS and BLOCHSF data """
 import os
 import sys
 import inspect
+
+# Add extra libraries' directories to import list
+baseLibDir = os.path.join(os.path.realpath(os.path.dirname(
+             inspect.getfile(inspect.currentframe()))), '..')
+sys.path.append(baseLibDir)
+
+# Import own libraries
+import nmod
 
 class Analysis(object):
     """ Analysis base class """
