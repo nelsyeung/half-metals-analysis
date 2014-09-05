@@ -108,6 +108,7 @@ if [ -d "$CONC" ]; then
     fi
 
     printf "Total time taken: %02dh %02dm %02ds" "$((S/3600%24))" "$((S/60%60))" "$((S%60))" >> $LOG
+    mv "../$CWD" "../../../raw/$CWD"
 else
     echo "$CONC does not exists."
 fi

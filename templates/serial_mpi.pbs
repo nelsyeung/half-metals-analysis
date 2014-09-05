@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -l nodes=4:ppn=1:theory,pvmem=256mb,walltime=08:00:00
+#PBS -l nodes=4:ppn=1:theory,pvmem=256mb,walltime=01:00:00
 #PBS -V
 
 cd $PBS_O_WORKDIR
@@ -79,3 +79,4 @@ else
 fi
 
 printf "Total time taken: %02dh %02dm %02ds" "$((S/3600%24))" "$((S/60%60))" "$((S%60))" >> $LOG
+mv "../$CWD" "../../../raw/$CWD"

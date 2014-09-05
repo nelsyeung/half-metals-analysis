@@ -12,11 +12,12 @@ import nmod
 
 class Jobs(object):
     """ Jobs base class """
-    def __init__(self, jobsDir):
+    def __init__(self, mainDir):
         baseDir = os.path.join(os.path.dirname(os.path.realpath(
             inspect.getfile(inspect.currentframe()))), '..')
         self.templatesDir = os.path.join(baseDir, 'templates')
-        self.jobsDir = os.path.join(baseDir, jobsDir, 'jobs')
+        self.jobsDir = os.path.join(baseDir, mainDir, 'jobs')
+        numJobs = 0 # For checking number of jobs in the jobs folder.
         error = False # Error flag for exiting program.
 
         # Check if the required directories exist
@@ -27,31 +28,32 @@ class Jobs(object):
             error = True
 
         if os.path.isdir(self.jobsDir) is False:
-            print('The directory provided does not exists.')
+            print('The directory provided does not have a jobs folder.')
             error = True
         else:
             # Check if there are any jobs in the new folder.
-            os.chdir(os.path.join(self.jobsDir, 'new'))
+            newJobsDir = os.path.join(self.jobsDir, 'new')
 
-            numJobs = len([name for name in os.listdir('./')
-                          if os.path.isdir(name)])
+            if os.path.isdir(newJobsDir) is True:
+                os.chdir(newJobsDir)
 
-            if numJobs == 0:
-                print('No jobs in ' + os.path.join(jobsDir, 'jobs', 'new') + '.')
-                print('Please make sure that your jobs are in that folder.')
-                error = True
+                numJobs = len([name for name in os.listdir('./')
+                              if os.path.isdir(name)])
+
+        # Check if there are any jobs in the new folder.
+        if numJobs == 0:
+            print('No jobs in '
+                  + os.path.join(mainDir, 'jobs', 'new') + '.')
+            print('Please make sure that your jobs are in that folder.')
+            error = True
 
         if error:
             nmod.nexit()
         else:
             os.chdir(self.jobsDir)
 
-    def modTemplateFile(self, new, tmp, reps):
-        """ Copy and modify the specified template file to a new location """
-        with open(new, 'w+') as fnew:
-            with open(os.path.join(self.templatesDir, tmp), 'r') as ftmp:
-                for line in ftmp:
-                    fnew.write(nmod.replaceAll(line, reps))
+    def submitSerial(self):
+        """ Submit many serial jobs without overloading the task farm """
 
     def submitArray(self, start, end, step):
         """ Submit many array jobs without overloading the task farm """
@@ -70,7 +72,8 @@ class Jobs(object):
             'tmpTSTART' : start,
             'tmpTEND'   : step + start - 1
         }
-        self.modTemplateFile(pbsFile, pbsFile, reps)
+        nmod.modFile(pbsFile,
+            os.path.join(self.templatesDir, pbsFile), reps)
         subprocess.Popen(subCmd)
 
         time.sleep(10) # Sleep to make sure the jobs are submitted.
@@ -118,7 +121,8 @@ class Jobs(object):
                     'tmpTEND'   : (i+1) * step + start - 1
                 }
 
-            self.modTemplateFile(pbsFile, pbsFile, reps)
+            nmod.modFile(pbsFile,
+                os.path.join(self.templatesDir, pbsFile), reps)
             subprocess.Popen(subCmd)
 
         timeTaken = nmod.seconds2str(int(time.time()) - timeStart)
