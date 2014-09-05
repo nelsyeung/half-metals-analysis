@@ -9,7 +9,7 @@ CONTROL  DATASET     = tmpDATASET
 
 TAU      BZINT= POINTS  NKTAB= tmpNKTAB 
  
-ENERGY   GRID={3}  NE={tmpBSFNE} 
+ENERGY   GRID={3}  NE={tmpNE} 
          EMIN=tmpEMIN   EMAX=tmpEMAX   ImE=0.0 Ry
 
 TASK     BSF

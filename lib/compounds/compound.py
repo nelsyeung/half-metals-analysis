@@ -25,26 +25,6 @@ class Compound(object):
         self.potFile = potFile
         self.potPath = os.path.join(self.templatesDir, potFile + '.pot')
         self.alat = alat
-        self.settings = {
-            'mode': 'SP-SREL',
-            'nktab': '250',
-            'ImE': '0.0005',
-            'SCF': {
-                'NE': '30'
-            },
-            'DOS': {
-                'NE': '50'
-            },
-            'BSF': {
-                'NE': '1',
-                'EMIN': '1.0',
-                'EMAX': '1.0',
-                'NK1': '60',
-                'NK2': '60',
-                'K1': '{1.0, 0.0, 0.0}',
-                'K2': '{0.0, 1.0, 0.0}'
-            }
-        }
         error = False # Error flag for exiting program.
 
         # Check if the required directories exist
@@ -58,8 +38,7 @@ class Compound(object):
             print('The directory provided does not exists.')
             error = True
 
-        if (os.path.exists(self.potPath)
-                is False):
+        if (os.path.isfile(self.potPath) is False):
             print('The potential file provided does not exists.')
             error = True
 
@@ -68,16 +47,20 @@ class Compound(object):
         else:
             os.chdir(self.jobsDir)
 
-    def modTemplateFile(self, new, tmp, reps):
-        """ Copy and modify the specified template file to a new location """
-        with open(new, 'w+') as fnew:
-            with open(os.path.join(self.templatesDir, tmp), 'r') as ftmp:
-                for line in ftmp:
-                    fnew.write(nmod.replaceAll(line, reps))
-
-    def create(self, fullConc):
+    def create(self, fullConc, **kwargs):
         """ Create the specified compound """
         elementsFile = os.path.join(self.templatesDir, 'elements.txt')
+
+        # Set default settings.
+        settings = {
+            'mode'  : 'REL',
+            'nktab' : '250',
+            'NE'    : '30'
+        }
+
+        # Replace default settings with user defined settings.
+        for key, value in kwargs.iteritems():
+            settings[key] = value
 
         # Set the different concentrations
         concentrations = fullConc.split('_')
@@ -123,23 +106,36 @@ class Compound(object):
                 'tmpIT4'    : IT[3],
                 'tmpIT5'    : IT[4]
             }
-            self.modTemplateFile(os.path.join(fullConc, 'pot.pot'),
-                         self.potFile + '.pot', reps)
+            nmod.modFile(os.path.join(fullConc, 'pot.pot'),
+                os.path.join(self.templatesDir, self.potFile + '.pot'), reps)
 
             # SCF
             reps = {
                 'tmpDATASET' : fullname,
-                'tmpMODE'    : self.settings['mode'],
-                'tmpNKTAB'   : self.settings['nktab'],
-                'tmpSCFNE'   : self.settings['SCF']['NE']
+                'tmpMODE'    : settings['mode'],
+                'tmpNKTAB'   : settings['nktab'],
+                'tmpNE'      : settings['NE']
             }
-            self.modTemplateFile(os.path.join(fullConc, 'scf.inp'), 'scf.inp', reps)
+            nmod.modFile(os.path.join(fullConc, 'scf.inp'),
+                os.path.join(self.templatesDir, 'scf.inp'), reps)
 
             print(fullname + " has been created.")
 
-    def generateDOS(self):
+    def generateDOS(self, **kwargs):
         """ Generate DOS input files for all the compounds created """
-        settingsDOS = self.settings['DOS']
+        # Set default settings.
+        settings = {
+            'mode'  : 'REL',
+            'nktab' : '250',
+            'NE'    : '50',
+            'EMIN'  : '-0.2',
+            'EMAX'  : '1.0',
+            'ImE'   : '0.01'
+        }
+
+        # Replace default settings with user defined settings.
+        for key, value in kwargs.iteritems():
+            settings[key] = value
 
         print('Generating DOS input files.')
 
@@ -152,19 +148,34 @@ class Compound(object):
                 else:
                     reps = {
                         'tmpDATASET' : directory,
-                        'tmpMODE'    : self.settings['mode'],
-                        'tmpNKTAB'   : self.settings['nktab'],
-                        'tmpDOSNE'   : settingsDOS['NE'],
-                        'tmpImE'     : self.settings['ImE']
+                        'tmpMODE'    : settings['mode'],
+                        'tmpNKTAB'   : settings['nktab'],
+                        'tmpNE'      : settings['NE'],
+                        'tmpEMIN'    : settings['EMIN'],
+                        'tmpEMAX'    : settings['EMAX'],
+                        'tmpImE'     : settings['ImE']
                     }
-                    self.modTemplateFile(os.path.join(directory, 'dos.inp'),
-                                 'dos.inp', reps)
+                    nmod.modFile(os.path.join(directory, 'dos.inp'),
+                        os.path.join(self.templatesDir, 'dos.inp'), reps)
 
         print('Finish generating DOS input files.')
 
-    def generateBSF(self):
+    def generateBSF(self, **kwargs):
         """ Generate BSF input files for all the compounds created """
-        settingsBSF = self.settings['BSF']
+        settings = {
+            'nktab' : '250',
+            'NE'    : '1',
+            'EMIN'  : '1.0',
+            'EMAX'  : '1.0',
+            'NK1'   : '60',
+            'NK2'   : '60',
+            'K1'    : '{1.0, 0.0, 0.0}',
+            'K2'    : '{0.0, 1.0, 0.0}'
+        }
+
+        # Replace default settings with user defined settings.
+        for key, value in kwargs.iteritems():
+            settings[key] = value
 
         print('Generating BSF input files.')
 
@@ -177,16 +188,16 @@ class Compound(object):
                 else:
                     reps = {
                         'tmpDATASET' : directory,
-                        'tmpNKTAB'   : self.settings['nktab'],
-                        'tmpBSFNE'   : settingsBSF['NE'],
-                        'tmpEMIN'    : settingsBSF['EMIN'],
-                        'tmpEMAX'    : settingsBSF['EMAX'],
-                        'tmpNK1'     : settingsBSF['NK1'],
-                        'tmpNK2'     : settingsBSF['NK1'],
-                        'tmpK1'      : settingsBSF['K1'],
-                        'tmpK2'      : settingsBSF['K2']
+                        'tmpNKTAB'   : settings['nktab'],
+                        'tmpNE'      : settings['NE'],
+                        'tmpEMIN'    : settings['EMIN'],
+                        'tmpEMAX'    : settings['EMAX'],
+                        'tmpNK1'     : settings['NK1'],
+                        'tmpNK2'     : settings['NK1'],
+                        'tmpK1'      : settings['K1'],
+                        'tmpK2'      : settings['K2']
                     }
-                    self.modTemplateFile(os.path.join(directory, 'bsf.inp'),
-                                 'bsf.inp', reps)
+                    nmod.modFile(os.path.join(directory, 'bsf.inp'),
+                         os.path.join(self.templatesDir, 'bsf.inp'), reps)
 
         print('Finish generating BSF input files.')

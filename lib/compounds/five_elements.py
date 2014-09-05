@@ -21,7 +21,7 @@ class FiveElements(Compound):
 
         Compound.__init__(self, jobsDir, elements, potFile, alat)
 
-    def generateConcentrations(self, num):
+    def generateConcentrations(self, num, **kwargs):
         """ Generate the required permutations of concentrations """
         if self.potFile == 'sc_5_elements_b2':
             a, b, c, d, e = 1.0, 0.5, 0.0, 0.5, 0.0
@@ -36,8 +36,8 @@ class FiveElements(Compound):
                 conc[2] = nmod.float2str(precision, c + x * step)
                 conc[3] = nmod.float2str(precision, d - y * step)
                 conc[4] = nmod.float2str(precision, e + y * step)
-                self.create(conc[0] + '_' + conc[1] + '_'
-                            + conc[2] + '_' + conc[3] + '_' + conc[4])
+                self.create(conc[0] + '_' + conc[1] + '_' + conc[2]
+                            + '_' + conc[3] + '_' + conc[4], **kwargs)
         else:
             print(self.potFile + ' has not yet been implemented.')
             nmod.nexit()

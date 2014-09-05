@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """ Generate compounds """
 import os
 import sys
@@ -15,12 +15,10 @@ sys.path.append(compoundsLibDir)
 from five_elements import FiveElements
 
 if __name__ == '__main__':
+    nktab = 250
     compounds = FiveElements('CFMGS/B2', 'Co Fe Mn Ga Si',
                             'sc_5_elements_b2', '5.333751602764')
-    # compounds.settings['nktab'] = '1000'
-    # compounds.settings['SCF']['NE'] = '60'
-    # compounds.settings['DOS']['NE'] = '100'
-    # compounds.settings['BSF']['NK'] = '120'
-    compounds.generateConcentrations(21)
-    compounds.generateDOS()
-    compounds.generateBSF()
+    compounds.generateConcentrations(21, mode='SP-SREL', nktab=nktab, NE=30)
+    compounds.generateDOS(mode='SP-SREL', nktab=nktab, NE=50,
+                          EMIN=0.74, EMAX=1.0, ImE=0.0005)
+    compounds.generateBSF(nktab=nktab)
