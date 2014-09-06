@@ -1,3 +1,4 @@
 CFMGS
 *.swp
 **/*/__pycache__
+*pyc
