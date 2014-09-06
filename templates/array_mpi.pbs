@@ -79,13 +79,13 @@ if [ -d "$CONC" ]; then
             printToLog "Successful: kkrgen6.3MPI dos.inp" $T
             T=$SECONDS
 
-            # Create readable data files and simple DOS plots
+            # Create readable data files and simple DOS plots.
             DOSFNAME=$(find ./ -name "*DOS.dos")
             sed -i 's/page size/page size 2500, 2500\n#/g' *.agr
             plot_linux-gnu < "$DOSFNAME" > .agr
             gracebat dos.agr -printfile dos.ps
         else
-            # Move to unsuccessful
+            # Move to unsuccessful.
             printToLog "!!! ERROR: kkrgen6.3MPI dos.inp" $T
             mvToUnsuccessful "$CWD"
         fi
@@ -95,9 +95,11 @@ if [ -d "$CONC" ]; then
 
         # If BSF file is not created from kkrgen,
         # move folder to unsuccessful.
-        if [ ! -f *spol.bsf ]; then
+        if [ -f *spol.bsf ]; then
+            printToLog "Successful: kkrgen6.3MPI bsf.inp" $T
             T=$SECONDS
-
+        else
+            # Move to unsuccessful.
             printToLog "!!! ERROR: kkrgen6.3MPI bsf.inp" $T
             mvToUnsuccessful "$CWD"
         fi

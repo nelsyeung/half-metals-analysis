@@ -66,11 +66,13 @@ if [ -f "pot.pot_new" ]; then
 
     # If BSF file is not created from kkrgen,
     # move folder to unsuccessful.
-    if [ ! -f *spol.bsf ]; then
+    if [ -f *spol.bsf ]; then
+        printToLog "Successful: kkrgen6.3MPI bsf.inp" $T
         T=$SECONDS
-
+    else
+        # Move to unsuccessful.
         printToLog "!!! ERROR: kkrgen6.3MPI bsf.inp" $T
-        mvToUnsuccessful
+        mvToUnsuccessful "$CWD"
     fi
 else
     # Move to unsuccessful
