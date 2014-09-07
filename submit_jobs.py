@@ -14,5 +14,5 @@ sys.path.append(baseLibDir)
 import jobs
 
 if __name__ == '__main__':
-    jobs.submitArray('CFMGS/B2', 'array_mpi_bsf.pbs', 1, 441,
-                     step=10, interval=60)
+    jobs.submitArray('CFMGS/L21', 'array_mpi_l21.pbs', 1, 441,
+                     step=10, interval=300)

@@ -16,10 +16,12 @@ from five_elements import FiveElements
 
 if __name__ == '__main__':
     nktab = 1000
-    compounds = FiveElements('CFMGS/B2', 'Co Fe Mn Ga Si',
-                            'sc_5_elements_b2', '5.333751602764')
-    # compounds.generateConcentrations(21, mode='SP-SREL', nktab=nktab, NE=60)
-    # compounds.generateDOS(mode='SP-SREL', nktab=nktab, NE=100,
-    #                       EMIN=0.73, EMAX=1.0, ImE=0.0005)
+    compounds = FiveElements('CFMGS/L21', 'Co Fe Mn Ga Si',
+                            'fcc_5_elements_l21', '10.6675032055')
+    compounds.generateConcentrations(21, mode='SP-SREL', nktab=nktab, NE=60)
+    compounds.generateDOS(mode='SP-SREL', nktab=nktab, NE=100,
+                          EMIN=0.73, EMAX=1.0, ImE=0.0005)
     compounds.generateBSF(nktab=nktab, NK1=180, NK2=180,
-                          EMIN=0.8652, EMAX=0.8652, iterations=10)
+                          EMIN=0.8652, EMAX=0.8652)
+    # compounds.generateBSF(nktab=nktab, NK1=180, NK2=180,
+    #                       EMIN=0.8652, EMAX=0.8652, iterations=10)
