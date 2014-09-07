@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-""" Submit jobs """
+""" Analyse data """
 import os
 import sys
 import inspect
@@ -11,8 +11,9 @@ baseLibDir = os.path.join(os.path.realpath(os.path.dirname(
 sys.path.append(baseLibDir)
 
 # Import own libraries
-import jobs
+from analysis import Analysis
 
 if __name__ == '__main__':
-    jobs.submitArray('CFMGS/B2', 'array_mpi_bsf.pbs', 1, 441,
-                     step=10, interval=60)
+    analysis = Analysis('CFMGS/B2')
+    # analysis.bandGap(-0.5, 0.4, 0.05)
+    analysis.dosDiff(0.8)

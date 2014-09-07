@@ -5,6 +5,7 @@
 cd $PBS_O_WORKDIR
 
 # Variable definitions
+ERR=false
 CWD=${PWD##*/}
 LOG="nlog"
 DATETIME=$(date +"%d/%m/%y %T")
@@ -19,7 +20,7 @@ printToLog() {
 }
 
 mvToUnsuccessful() {
-    mv "../$CWD" ../../unsuccessful
+    mv "../$1" ../../unsuccessful
 }
 
 # Append to or create log file with current time.
@@ -58,7 +59,8 @@ if [ -f "pot.pot_new" ]; then
     else
         # Move to unsuccessful
         printToLog "!!! ERROR: kkrgen6.3MPI dos.inp" $T
-        mvToUnsuccessful
+        mvToUnsuccessful "$CWD"
+        $ERR=true
     fi
 
     # Run BSF
@@ -73,12 +75,18 @@ if [ -f "pot.pot_new" ]; then
         # Move to unsuccessful.
         printToLog "!!! ERROR: kkrgen6.3MPI bsf.inp" $T
         mvToUnsuccessful "$CWD"
+        $ERR=true
     fi
 else
     # Move to unsuccessful
     printToLog "!!! ERROR: kkrscf6.3MPI scf.inp > scf.out" $T
-    mvToUnsuccessful
+    mvToUnsuccessful "$CWD"
+    $ERR=true
 fi
 
 printf "Total time taken: %02dh %02dm %02ds" "$((S/3600%24))" "$((S/60%60))" "$((S%60))" >> $LOG
-mv "../$CWD" "../../../raw/$CWD"
+
+# Move to raw folder if every ran successfully.
+if [ "$ERR" = false ]; then
+    mv "../$CWD" "../../../raw/$CWD"
+fi

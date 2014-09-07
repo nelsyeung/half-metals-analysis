@@ -1,6 +1,7 @@
 """ Useful and shared functions """
 import os
 import math
+import numpy as np
 from scipy.interpolate import interp1d
 
 def chunks(l, size):
@@ -19,7 +20,7 @@ def findLine(filename, s):
 
 def findMean(l):
     """ Find the mean of a list """
-    return math.fsum(l) / float(len(l))
+    return math.fsum(l) / len(l)
 
 def replaceAll(text, reps):
     """ Replace all the matching strings from a piece of text """
@@ -45,7 +46,7 @@ def nexit():
 
 def seconds2str(s):
     """ Return a nicely formatted time string from seconds """
-    seconds = str(s % 60)
+    seconds = str(int(s % 60))
     minutes = str(int(s / 60) % 60)
     hours = str(int(s / 3600))
     return hours + 'h ' + minutes + 'm ' + seconds + 's'
@@ -62,7 +63,7 @@ def getDOS(filePath, spin):
     baseDir = os.path.dirname(os.path.abspath(filePath))
     filename = os.path.basename(filePath).split('.')[0]
     outFile = os.path.join(baseDir, filename + '_' + spin + '.txt')
-    DOS = []
+    dos = []
     record = False
 
     if spin == 'up':
@@ -88,16 +89,88 @@ def getDOS(filePath, spin):
             if record and not '@' in line:
                 x = float(line.split()[0])
                 y = float(line.split()[1])
-                DOS.append([x, y])
+                dos.append([x, y])
 
     if os.path.isfile(outFile) is True:
         os.remove(outFile)
 
     with open(outFile, 'a+') as f:
-        for x, y in DOS:
+        for x, y in dos:
             f.write(str(x) + ' ' + str(y) + '\n')
 
-    return DOS
+    return dos
+
+def getBSF3D(filePath, spin, numSites):
+    """ Store into text file and return 3D BSF data """
+    baseDir = os.path.dirname(os.path.abspath(filePath))
+    bsfnum = os.path.basename(filePath).split('_')[-2]
+    if bsfnum.isdigit() == True:
+        outFile = os.path.join(baseDir, bsfnum + '_bsf3d_' + spin + '.txt')
+    else:
+        outFile = os.path.join(baseDir, 'bsf3d_' + spin + '.txt')
+    raw = []
+    hashCount = 0 # For determining when to start reading raw data.
+
+    # Get raw data first.
+    with open(filePath) as f:
+        for l in f:
+            line = l.rstrip()
+
+            if '###' in line:
+                hashCount += 1
+                continue
+
+            if hashCount == 3:
+                x = float(line.split()[0])
+                y = float(line.split()[1])
+                raw.append([x, y])
+
+    # Generate plotable data from raw
+    numUseful = (numSites - 1) * 2
+    nk = len(raw) / numUseful
+    nk2 = nk * nk
+    bsf = [[] for i in range(nk)]
+
+    if spin == 'up':
+        sign = -1
+    elif spin == 'down':
+        sign = 1
+
+    for i in range(nk2):
+        n = math.floor(i / nk)
+        j = i + (nk2 * numUseful - 2)
+        bsf[n].append(float(raw[i]) + sign * float(raw[j]))
+
+    if os.path.isfile(outFile) is True:
+        os.remove(outFile)
+
+    np.savetxt(outFile, bsf)
+
+    return bsf
+
+def getBSF2D(filePath, spin, numSites):
+    """ Store into text file and return single strip of BSF data """
+    baseDir = os.path.dirname(os.path.abspath(filePath))
+    bsfnum = os.path.basename(filePath).split('_')[-2]
+    if bsfnum.isdigit() == True:
+        outFile = os.path.join(baseDir, bsfnum + '_bsf2d_' + spin + '.txt')
+    else:
+        outFile = os.path.join(baseDir, 'bsf2d_' + spin + '.txt')
+    bsf3D = getBSF3D(filePath, spin, numSites)
+    bsf = []
+    nk = len(bsf3D)
+
+    for i in range(nk):
+        bsf.append([ i / nk, bsf3D[0][i]])
+
+    if os.path.isfile(outFile) is True:
+        os.remove(outFile)
+
+    with open(outFile, 'a+') as f:
+        for x, y in bsf:
+            f.write(str(x) + ' ' + str(y) + '\n')
+
+    return bsf
 
 def getInterp1d(data):
     """ Get interpolated data from a list with x and y values """

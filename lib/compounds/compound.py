@@ -139,24 +139,23 @@ class Compound(object):
 
         print('Generating DOS input files.')
 
-        for _, dirs, _ in os.walk('./'):
-            for directory in dirs:
-                if (os.path.exists(os.path.join(directory, 'dos.inp'))
-                        is True):
-                    print(directory + ' already contains dos.inp, '
-                          + 'it will not be overwritten.')
-                else:
-                    reps = {
-                        'tmpDATASET' : directory,
-                        'tmpMODE'    : settings['mode'],
-                        'tmpNKTAB'   : settings['nktab'],
-                        'tmpNE'      : settings['NE'],
-                        'tmpEMIN'    : settings['EMIN'],
-                        'tmpEMAX'    : settings['EMAX'],
-                        'tmpImE'     : settings['ImE']
-                    }
-                    nmod.modFile(os.path.join(directory, 'dos.inp'),
-                        os.path.join(self.templatesDir, 'dos.inp'), reps)
+        for dirname in os.listdir('.'):
+            if (os.path.exists(os.path.join(dirname, 'dos.inp'))
+                    is True):
+                print(dirname + ' already contains dos.inp, '
+                      + 'it will not be overwritten.')
+            else:
+                reps = {
+                    'tmpDATASET' : dirname,
+                    'tmpMODE'    : settings['mode'],
+                    'tmpNKTAB'   : settings['nktab'],
+                    'tmpNE'      : settings['NE'],
+                    'tmpEMIN'    : settings['EMIN'],
+                    'tmpEMAX'    : settings['EMAX'],
+                    'tmpImE'     : settings['ImE']
+                }
+                nmod.modFile(os.path.join(dirname, 'dos.inp'),
+                    os.path.join(self.templatesDir, 'dos.inp'), reps)
 
         print('Finish generating DOS input files.')
 
@@ -170,7 +169,9 @@ class Compound(object):
             'NK1'   : '60',
             'NK2'   : '60',
             'K1'    : '{1.0, 0.0, 0.0}',
-            'K2'    : '{0.0, 1.0, 0.0}'
+            'K2'    : '{0.0, 1.0, 0.0}',
+            'eRange': 0.01,
+            'iterations': 0
         }
 
         # Replace default settings with user defined settings.
@@ -179,15 +180,15 @@ class Compound(object):
 
         print('Generating BSF input files.')
 
-        for _, dirs, _ in os.walk('./'):
-            for directory in dirs:
-                if (os.path.exists(os.path.join(directory, 'bsf.inp'))
+        for dirname in os.listdir('.'):
+            if settings['iterations'] == 0:
+                if (os.path.exists(os.path.join(dirname, 'bsf.inp'))
                         is True):
-                    print(directory + ' already contains bsf.inp, '
+                    print(dirname + ' already contains bsf.inp, '
                           + 'it will not be overwritten.')
                 else:
                     reps = {
-                        'tmpDATASET' : directory,
+                        'tmpDATASET' : dirname,
                         'tmpNKTAB'   : settings['nktab'],
                         'tmpNE'      : settings['NE'],
                         'tmpEMIN'    : settings['EMIN'],
@@ -197,7 +198,33 @@ class Compound(object):
                         'tmpK1'      : settings['K1'],
                         'tmpK2'      : settings['K2']
                     }
-                    nmod.modFile(os.path.join(directory, 'bsf.inp'),
+                    nmod.modFile(os.path.join(dirname, 'bsf.inp'),
                          os.path.join(self.templatesDir, 'bsf.inp'), reps)
+            else:
+                energy = (settings['EMIN'] - 0.5*float(settings['eRange']))
+
+                for i in range(settings['iterations']):
+                    tmpnum = str(i + 1)
+                    bsfFile = 'bsf_' + tmpnum + '.inp'
+
+                    if (os.path.exists(os.path.join(dirname, bsfFile))
+                            is True):
+                        print(dirname + ' already contains ' + bsfFile + ', '
+                              + 'it will not be overwritten.')
+                    else:
+                        energy += settings['eRange'] / settings['iterations']
+                        reps = {
+                            'tmpDATASET' : dirname + '_' + tmpnum,
+                            'tmpNKTAB'   : settings['nktab'],
+                            'tmpNE'      : 1,
+                            'tmpEMIN'    : energy,
+                            'tmpEMAX'    : energy,
+                            'tmpNK1'     : settings['NK1'],
+                            'tmpNK2'     : settings['NK1'],
+                            'tmpK1'      : settings['K1'],
+                            'tmpK2'      : settings['K2']
+                        }
+                        nmod.modFile(os.path.join(dirname, bsfFile),
+                             os.path.join(self.templatesDir, 'bsf.inp'), reps)
 
         print('Finish generating BSF input files.')
