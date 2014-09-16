@@ -93,7 +93,9 @@ if [ -d "$CONC" ]; then
         fi
 
         # Run BSF
-        mpirun kkrgen6.3MPI bsf.inp
+        if [ -f bsf.inp ]; then
+            mpirun kkrgen6.3MPI bsf.inp
+        fi
 
         # If BSF file is not created from kkrgen,
         # move folder to unsuccessful.

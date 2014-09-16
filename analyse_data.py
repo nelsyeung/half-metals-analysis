@@ -15,5 +15,5 @@ from analysis import Analysis
 
 if __name__ == '__main__':
     analysis = Analysis('CFMGS/B2')
-    # analysis.bandGap(-0.5, 0.4, 0.05)
-    analysis.dosDiff(0.8)
+    analysis.bandGap(-0.5, 0.4, 0.05)
+    analysis.dosDiff(0.6)

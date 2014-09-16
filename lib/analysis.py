@@ -160,7 +160,7 @@ class Analysis(object):
                 integrals.append(integral)
 
             minIntegral = min(integrals)
-            I_bg.append(minIntegral)
+            I_bg.append(-minIntegral)
             concentrations.append(dirname)
 
             with open(outFile, 'a+') as f:
@@ -224,16 +224,18 @@ class Analysis(object):
 
             correction = sorted(truncated, key=itemgetter(1))[0][0]
 
-            for i in range(dataLen):
-                dosUp[i][0] -= correction
-                dosDown[i][0] -= correction
+            # Shift the whole dataset.
+            # for i in range(dataLen):
+            #     dosUp[i][0] += correction
+            #     dosDown[i][0] += correction
 
             # Linearly interpolate the DOS data.
             dosUpInterp = nmod.getInterp1d(dosUp)
             dosDownInterp = nmod.getInterp1d(dosDown)
 
             # Calculate the difference between the DOS at E-E_f = 0eV.
-            dosDiff = dosUpInterp(0) - dosDownInterp(0)
+            dosDiff = dosUpInterp(correction) - dosDownInterp(correction)
+            # dosDiff = dosDownInterp(0)
             I_dos.append(dosDiff)
             concentrations.append(dirname)
 
